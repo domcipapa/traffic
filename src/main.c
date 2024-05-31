@@ -48,17 +48,45 @@ int main(void) {
     float enabled_timer = 0.0f;
     char previous_side = 'd';
 
+    float disabled_tick = 0.7f;
+    float enabled_tick = 3.0f;
+
     bool status = false;
     while (!WindowShouldClose()) {
         Vector2 mouse_position = GetMousePosition();
 
-        if (disabled_timer >= 0.7f) {
+        if (disabled_timer >= disabled_tick) {
             disabled_pulse(status, lamps, lamps_size);
             disabled_timer = 0.0f;
         }
         disabled_timer += GetFrameTime();
 
-        if (enabled_timer >= 1.0f) {
+        if (status && enabled_tick - enabled_timer < 1.0f) {
+            for (int i = 0; i < lamps_size; i++) {
+                if (lamps[i].side == 'a' && previous_side == 'd') {
+                    lamps[i].yellow.enabled = true;
+                    lamps[i - 2].yellow.enabled = true;
+                    lamps[i - 2].green.enabled = false;
+                }
+                if (lamps[i].side == 'b' && previous_side == 'a') {
+                    lamps[i].yellow.enabled = true;
+                    lamps[i - 2].yellow.enabled = true;
+                    lamps[i - 2].green.enabled = false;
+                }
+                if (lamps[i].side == 'c' && previous_side == 'b') {
+                    lamps[i].yellow.enabled = true;
+                    lamps[i - 2].yellow.enabled = true;
+                    lamps[i - 2].green.enabled = false;
+                }
+                if (lamps[i].side == 'd' && previous_side == 'c') {
+                    lamps[i].yellow.enabled = true;
+                    lamps[i - 2].yellow.enabled = true;
+                    lamps[i - 2].green.enabled = false;
+                }
+            }
+        }
+
+        if (enabled_timer >= enabled_tick) {
             enabled_logic(&previous_side, &lamps, lamps_size, status);
             enabled_timer = 0.0f;
         }

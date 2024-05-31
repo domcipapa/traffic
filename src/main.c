@@ -49,7 +49,7 @@ int main(void) {
     char previous_side = 'd';
 
     float disabled_tick = 0.7f;
-    float enabled_tick = 3.0f;
+    float enabled_tick = 5.0f;
 
     bool status = false;
     while (!WindowShouldClose()) {
@@ -97,6 +97,7 @@ int main(void) {
             DrawTexture(background, 0, 0, WHITE);
             render_lamps(lamps, lamps_size, light_radius);
             render_button(button, disabled_x, enabled_x, y, font_size, button_color, status, disabled, enabled);
+            DrawText(TextFormat("Disabled remaining: %.2f\nEnabled remaining: %.2f", disabled_tick - disabled_timer, enabled_tick - enabled_timer), 120, 20, 13, YELLOW);
         } EndDrawing();
     }
     return 0;

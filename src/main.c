@@ -17,6 +17,7 @@ void init(Texture2D *background, Lamp **lamps, int lamps_size);
 void render_lamps(Lamp *lamps, int lamps_size, float light_radius);
 void render_button(Rectangle button, float disabled_x, float enabled_x, float y, int font_size, Color color, bool status, char *disabled, char *enabled);
 void on_button(Vector2 mouse_position, Rectangle button, Color *color, bool *status);
+void offline_pulse(bool status, Lamp *lamps, int lamps_size);
 
 int main(void) {
     Texture2D background;
@@ -40,9 +41,18 @@ int main(void) {
     float enabled_x = button.x + (button.width - (float) enabled_width) / 2;
     float y = button.y + (button.height - (float) font_size) / 2;
 
+    float timer = 0.0f;
+
     bool status = false;
     while (!WindowShouldClose()) {
+        timer += GetFrameTime();
         Vector2 mouse_position = GetMousePosition();
+
+        if (timer >= 0.7f) {
+            offline_pulse(status, lamps, lamps_size);
+            timer = 0.0f;
+        }
+
         on_button(mouse_position, button, &button_color, &status);
         BeginDrawing(); {
             DrawTexture(background, 0, 0, WHITE);
@@ -51,6 +61,13 @@ int main(void) {
         } EndDrawing();
     }
     return 0;
+}
+
+void offline_pulse(bool status, Lamp *lamps, int lamps_size) {
+    if (status) return;
+    for (int i = 0; i < lamps_size; i++) {
+        lamps[i].yellow.enabled = !lamps[i].yellow.enabled;
+    }
 }
 
 void on_button(Vector2 mouse_position, Rectangle button, Color *color, bool *status) {
@@ -75,13 +92,13 @@ void render_button(Rectangle button, float disabled_x, float enabled_x, float y,
 void render_lamps(Lamp *lamps, int lamps_size, float light_radius) {
     for (int i = 0; i < lamps_size; i++) {
         Lamp lamp = lamps[i];
-        if (!lamp.red.enabled) {
+        if (lamp.red.enabled) {
             DrawCircle(lamp.red.x, lamp.red.y, light_radius, RED);
         }
-        if (!lamp.yellow.enabled) {
-            DrawCircle(lamp.yellow.x, lamp.yellow.y, light_radius, YELLOW);
+        if (lamp.yellow.enabled) {
+            DrawCircle(lamp.yellow.x, lamp.yellow.y, light_radius, GOLD);
         }
-        if (!lamp.green.enabled) {
+        if (lamp.green.enabled) {
             DrawCircle(lamp.green.x, lamp.green.y, light_radius, GREEN);
         }
     }

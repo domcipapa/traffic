@@ -1,6 +1,15 @@
-cmake_minimum_required(VERSION 3.29)
+cmake_minimum_required(VERSION 3.28)
 project(traffic C)
+
 set(CMAKE_C_STANDARD 23)
+set(BUILD_SHARED_LIBS OFF)
 
 add_executable(traffic src/main.c assets/plc.h)
-target_link_libraries(traffic PRIVATE raylib)
+if (WIN32)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc -static-libstdc++")
+    include_directories("include")
+    find_library(RAYLIB raylib "lib")
+    target_link_libraries(traffic PRIVATE ${RAYLIB} winmm -static)
+else ()
+    target_link_libraries(traffic PRIVATE raylib m)
+endif ()
